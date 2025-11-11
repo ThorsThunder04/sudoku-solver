@@ -1,8 +1,6 @@
 #include <iostream>
-#include <string>
-#include <sstream>
 #include <vector>
-#include <cstdio>
+#include "solver.h"
 
 /**
  * @brief increments the coordinates to which box of the sudoku grid we want to look at next
@@ -27,6 +25,11 @@ bool next_box(int* r, int* c, int n2) {
 }
 
 
+/**
+ * @brief given a 2D vector of integers, print out each row of the vector with the integers separated by spaces
+ *
+ * @param (std::vector<std::vector<int>>) grid: the given 2D vector of integers
+ */
 void display_grid(std::vector<std::vector<int>> grid) {
 
     for (int r = 0; r < (int)grid.size(); r++) {
