@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 #include <unordered_set>
 #include "solver.h"
@@ -14,13 +13,15 @@
  */
 bool next_box(int* r, int* c, int n2) {
 
-    if (*r == n2-1) {
+    if (*r >= n2-1) {
         if (*r == *c) {
             return false; // we've reached the bottom right corner of the grid
         } else {
             *r = 0;
             (*c)++;
         }
+    } else {
+        (*r)++;
     }
     return true;
 }
@@ -101,4 +102,52 @@ bool check_subgrid(int sol, int r, int c, int sgn, std::vector<std::vector<int>>
 
     // check if number isn't already in the sub-grid
     return (seen.count(sol) == 0);
+}
+
+/**
+ * @brief recursively searches for the solution to the given sudoku grid
+ *
+ * @param (std::vector<std::vector<int>>) grid: the sudoku grid to solve
+ * @param (int) n: the size of the sudoku's sub-grids
+ * @param (int) r: the starting row for the search
+ * @param (int) c: the starting column for the search
+ *
+ * @returns true if the grid is solvable, false otherwise
+ */
+bool solve_sudoku(std::vector<std::vector<int>> grid, int n, int r, int c) {
+
+    // move coordinates until next empty box is found
+    bool not_done;
+    while (grid[r][c] != 0 && (not_done = next_box(&r, &c, n*n))) {}
+
+    // if we manage to find no more empty boxes, then the sudoku should be solved now
+    if (!not_done) {
+        return true;
+    }
+
+    // try placing every possible number at (r,c)
+    bool solved = false;
+    for (int k = 1; k <= n*n && !solved; k++) {
+
+        // check if placing k at grid[r][c] is valid
+        if (check_row(k, r, grid) &&
+            check_col(k, c, grid) &&
+            check_subgrid(k, r, c, n, grid)
+        ) {
+
+            grid[r][c] = k;
+
+            // prepare next box for next recursive call
+            int nr = r, nc = c;
+            next_box(&nr, &nc, n*n);
+
+            // go to solve the next empty box
+            if (solve_sudoku(grid, n, nr, nc)) {
+                solved = true;
+            }
+        }
+    }
+
+    grid[r][c] = 0;
+    return false;
 }

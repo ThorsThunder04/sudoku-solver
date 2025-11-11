@@ -64,6 +64,9 @@ int main() {
     // initializing search paramaters
     int r = 0;
     int c = 0;
+    solve_sudoku(grid, n, r, c);
+
+    display_grid(grid);
 
     return 0;
 }

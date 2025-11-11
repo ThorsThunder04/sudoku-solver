@@ -1,4 +1,5 @@
 #include <vector>
+#include <unordered_map>
 
 #ifndef SOLVER_H
 #define SOLVER_H
@@ -48,5 +49,17 @@ bool check_col(int sol, int c, std::vector<std::vector<int>> grid);
  * @returns true if placing a number at grid[r][c] is valid, false otherwise
  */
 bool check_subgrid(int sol, int r, int c, int sgn, std::vector<std::vector<int>> grid);
+
+/**
+ * @brief recursively searches for the solution to the given sudoku grid
+ *
+ * @param (std::vector<std::vector<int>>) grid: the sudoku grid to solve
+ * @param (int) n: the size of the sudoku's sub-grids
+ * @param (int) r: the starting row for the search
+ * @param (int) c: the starting column for the search
+ *
+ * @returns true if the grid is solvable, false otherwise
+ */
+bool solve_sudoku(std::vector<std::vector<int>> grid, int n, int r, int c);
 
 #endif
