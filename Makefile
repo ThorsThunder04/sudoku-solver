@@ -1,14 +1,18 @@
 CXX=g++
 FLAGS=-Wall
-TARGETS=solver
+TARGETS=main
+OBJECTS=main.o solver.o
 
 all: $(TARGETS)
 
-solver: solver.o
-	$(CXX) $< -o $@
+main: $(OBJECTS)
+	$(CXX) $? -o $@
 
 solver.o: solver.cpp solver.h
 	$(CXX) $(FLAGS) -c solver.cpp
+
+main.o: main.cpp main.h solver.h
+	$(CXX) $(FLAGS) -c main.cpp
 
 winclean:
 	del *.o

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 #include "solver.h"
 
 /**
@@ -24,58 +25,80 @@ bool next_box(int* r, int* c, int n2) {
     return true;
 }
 
-
 /**
- * @brief given a 2D vector of integers, print out each row of the vector with the integers separated by spaces
- *
- * @param (std::vector<std::vector<int>>) grid: the given 2D vector of integers
- */
-void display_grid(std::vector<std::vector<int>> grid) {
+    * @brief given a coordinate, a number to place there and a grid, check if placing the number in that row breaks the validity of the sudoku grid
+    *
+    * @param (int) sol: the number we want to place
+    * @param (int) r: the row on the grid
+    * @param (std::vector<std::vector<int>>) grid: the grid with all the numbers of the sudoku
+    *
+    * @returns true if we can place the given number on this row, false otherwise
+    */
+bool check_row(int sol, int r, std::vector<std::vector<int>> grid) {
 
-    for (int r = 0; r < (int)grid.size(); r++) {
-        for (int c = 0; c < (int)grid[r].size(); c++) {
-            std::cout << grid[r][c] << " ";
-        }
-        std::cout << std::endl;
+    std::unordered_set<int> seen;
+
+    for (int c = 0; c < (int)grid.size(); c++) {
+        int n = grid[r][c];
+        if (n != 0)
+            seen.insert(n);
     }
+
+    // check if number isn't already present in the row
+    return (seen.count(sol) == 0);
+
 }
 
-int main() {
+/**
+ * @brief given a column, a number to place int it and a grid, check if placing the number in that column breaks the validity of the sudoku grid
+ *
+ * @param (int) sol: the number we want to place
+ * @param (int) c: the column on the grid
+ * @param (std::vector<std::vector<int>>) grid: the grid with all the numbers of the sudoku
+ *
+ * @returns true if we can plcae the given number on this column, false otherwise
+ */
+bool check_col(int sol, int c, std::vector<std::vector<int>> grid) {
 
-    // n is the "subgrid" dimension.
-    // ex: on a 9x9 sudoku, the subgrid dimension would be 3
-    int n;
-    std::cout << "Enter subgrid size (= 3 on a 9x9 sudoku): ";
-    std::cin >> n;
-    int n2 = n*n;
+    std::unordered_set<int> seen;
 
-    std::vector<std::vector<int>> grid;
-    // set default size for vectors
-
-    std::cout << "Enter each line of your sudoku problem." << std::endl << "Separte each number by a space and write 0 for missing numbers." << std::endl;
-    std::cout << "You must input " << n2 << " numbers per line:" << std::endl;
-
-    int in_num;
-
-    // for each line
-    for (int i = 0; i < n2; i++) {
-
-        std::vector<int> line_vect;
-
-        // for each column
-        for (int j = 0; j < n2; j++) {
-            std::cin >> in_num;
-            line_vect.push_back(in_num);
-        }
-
-        grid.push_back(line_vect);
+    for (int r = 0; r < (int)grid[0].size(); r++) {
+        int n = grid[r][c];
+        if (n != 0)
+            seen.insert(n);
     }
 
-    for (int i = 0; i < 2*n2-1; i++) {std::cout <<"-";}
+    // check if number isn't already in the column
+    return (seen.count(sol) == 0);
+}
 
-    std::cout << std::endl;
-    display_grid(grid);
+/**
+ * @brief given a coordinate, a number to place there and a grid, check if placing the number in that sub-grid breaks the validity of the sudoku grid
+ *
+ * @param (int) sol: the number we want to place
+ * @param (int) r: the row on the grid
+ * @param (int) c: the column on the grid
+ * @param <int> sgn: sub-grid size
+ * @param (std::vector<std::vector<int>>) grid: the grid with all the numbers of the sudoku
+ *
+ * @returns true if placing a number at grid[r][c] is valid, false otherwise
+ */
+bool check_subgrid(int sol, int r, int c, int sgn, std::vector<std::vector<int>> grid) {
 
+    std::unordered_set<int> seen;
 
-    return 0;
+    // find the starting row and column of the current sub-grid
+    int sr = r / sgn;
+    int sc = c / sgn;
+
+    for (int ro = sr; ro < sr + sgn; ro++) {
+        for (int co = sc; co < sr + sgn; co++) {
+            int n = grid[ro][co];
+            if (n != 0)
+                seen.insert(n);
+        }
+    }
+
+    // check if number isn't already in the sub-grid
+    return (seen.count(sol) == 0);
 }
