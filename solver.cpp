@@ -14,7 +14,7 @@
 bool next_box(std::pair<int, int> *pos, int n2) {
 
     if (pos->first >= n2-1) {
-        if (pos->first == pos->second) {
+        if (pos->first <= pos->second) {
             return true; // we've reached the bottom right corner of the grid
         } else {
             pos->first = 0;
@@ -23,7 +23,6 @@ bool next_box(std::pair<int, int> *pos, int n2) {
     } else {
         pos->first++;
     }
-
     return false;
 }
 
@@ -89,16 +88,17 @@ bool check_subgrid(int sol, std::pair<int, int> *pos,int sgn, std::vector<std::v
     std::unordered_set<int> seen;
 
     // find the starting row and column of the current sub-grid
-    int sr = pos->first / sgn;
-    int sc = pos->second / sgn;
+    int r = pos->first - (pos->first % sgn);
+    int c = pos->second - (pos->second %sgn);
 
-    for (int ro = sr; ro < sr + sgn; ro++) {
-        for (int co = sc; co < sr + sgn; co++) {
-            int n = grid[ro][co];
-            if (n != 0)
-                seen.insert(n);
+    for (int ro = r; ro < r + sgn; ro++) {
+        for (int co = c; co < c + sgn; co++) {
+            int num = grid[ro][co];
+            if (num != 0)
+                seen.insert(num);
         }
     }
+
 
     // check if number isn't already in the sub-grid
     return (seen.count(sol) == 0);
@@ -121,66 +121,28 @@ bool solve_sudoku(std::vector<std::vector<int>> &grid, int n, std::pair<int, int
         done = next_box(&pos, n*n);
     }
 
-    std::cout << done;
     // if we manage to find no more empty boxes, then the sudoku should be solved now
     if (done) {
         return true;
     }
 
-    // try placing every possible number at (r,c)
-    bool solved = false;
-    for (int k = 1; k <= n*n && !solved; k++) {
+    int k;
+    for (k = 1; k <= n*n; k++) {
 
-        // check if placing k at grid[r][c] is valid
-        if (check_row(k, pos.first, grid) &&
-            check_col(k, pos.second, grid) &&
-            check_subgrid(k, &pos, n, grid)
-        ) {
+        // check if k can be placed at the current position
+        if (check_row(k, pos.first, grid) && check_col(k, pos.second, grid) && check_subgrid(k, &pos, n, grid)) {
 
             grid[pos.first][pos.second] = k;
 
-            // prepare next box for next recursive call
-            std::pair<int, int> new_pos = pos; // does a copy of the object
+            std::pair<int, int> new_pos = pos;
             next_box(&new_pos, n*n);
 
-            // go to solve the next empty box
             if (solve_sudoku(grid, n, new_pos)) {
-                solved = true;
-                std::cout << "SOLVED" << std::endl;
+                return true;
             }
-            std::cout << pos.first << ", " << pos.second << std::endl;
         }
     }
 
-    if (!solved) {
-        grid[pos.first][pos.second] = 0;
-    }
-
-    return solved;
-}
-
-int main() {
-
-    std::vector<std::vector<int>> test_sudoku{
-        {0, 4, 0, 0},
-        {2, 0, 0, 4},
-        {0, 1, 0, 2},
-        {0, 2, 4, 0}
-    };
-
-    int n = 2;
-
-    bool res = solve_sudoku(test_sudoku, n, (std::pair<int, int>){0,0});
-
-
-    for (int i = 0; i < n*n; i++) {
-        for (int j = 0; j < n*n; j++) {
-            std::cout << test_sudoku[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << "result: " << res;
-
-    return 0;
+    grid[pos.first][pos.second] = 0;
+    return false;
 }
