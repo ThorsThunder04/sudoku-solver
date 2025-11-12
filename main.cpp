@@ -59,12 +59,12 @@ int main() {
     for (int i = 0; i < 2*n2-1; i++) {std::cout <<"-";}
 
     std::cout << std::endl;
-    display_grid(grid);
 
     // initializing search paramaters
-    int r = 0;
-    int c = 0;
-    solve_sudoku(grid, n, r, c);
+    std::pair<int, int> pos{0,0};
+
+    bool res = solve_sudoku(grid, n, pos);
+    std::cout << "result: " << res << std::endl;
 
     display_grid(grid);
 

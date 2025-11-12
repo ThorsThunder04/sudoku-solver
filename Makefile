@@ -14,6 +14,10 @@ solver.o: solver.cpp solver.h
 main.o: main.cpp main.h solver.h
 	$(CXX) $(FLAGS) -c main.cpp
 
+solver: solver.o
+	$(CXX) $< -o $@
+
+
 winclean:
 	del *.o
 	del *.exe
