@@ -6,4 +6,6 @@
 
 void display_grid(std::vector<std::vector<int>> grid);
 
+int main();
+
 #endif
